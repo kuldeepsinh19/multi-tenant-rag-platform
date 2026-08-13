@@ -7,6 +7,7 @@ from starlette.responses import Response
 
 from src.auth.router import router as auth_router
 from src.businesses.router import router as businesses_router
+from src.chat.cors import WidgetCORSMiddleware
 from src.chat.router import router as chat_router
 from src.core.config import get_settings
 from src.core.exceptions import register_exception_handlers
@@ -31,6 +32,20 @@ app = FastAPI(
     openapi_url="/openapi.json" if settings.docs_enabled else None,
 )
 
+# NOTE ON ORDER: Starlette applies the most-recently-added middleware OUTERMOST, so the
+# three registrations below run in reverse: WidgetCORS -> CORS -> RateLimit. That ordering
+# is load-bearing.
+#
+# Rate-limit middleware (owner: ratelimit/): enforced BEFORE chat handlers so abuse costs a
+# Redis INCR, not an LLM call, rejecting with a 429 before the request reaches the route.
+# Scoped to chat paths only — health/auth/admin/metrics pass through untouched.
+# Added FIRST so it sits INSIDE the CORS layers: its 429 JSONResponse short-circuits the
+# stack, and if it sat outside CORS that response would carry no Access-Control-Allow-Origin
+# and the browser would report an opaque network error instead of the 429.
+app.add_middleware(RateLimitMiddleware)
+
+# Dashboard CORS: a static allowlist. Does not (and cannot) cover the widget, whose
+# permitted origins live per-key in the database — see WidgetCORSMiddleware below.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.dashboard_origins,
@@ -39,12 +54,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-register_exception_handlers(app)
+# Per-key CORS for /widget/*. Added AFTER CORSMiddleware so it wraps it: Starlette's
+# CORSMiddleware answers every preflight it sees and rejects any origin outside its static
+# allowlist with a 400, which would kill widget preflights before they could be resolved
+# against the key's allowed_domains.
+app.add_middleware(WidgetCORSMiddleware)
 
-# Rate-limit middleware (owner: ratelimit/): enforced BEFORE chat handlers so abuse costs a
-# Redis INCR, not an LLM call, rejecting with a 429 before the request reaches the route.
-# Scoped to chat paths only — health/auth/admin/metrics pass through untouched.
-app.add_middleware(RateLimitMiddleware)
+register_exception_handlers(app)
 
 # Tracing middleware (owner: observability/): records per-request latency to Langfuse when
 # configured. Fail-open no-op otherwise.
