@@ -1,0 +1,6 @@
+# This repo is cloned with core.autocrlf=true, which rewrites checked-out files
+# to CRLF. widget/src/generated/tokens.ts is asserted byte-for-byte against a
+# fresh generator run by widget/src/generated/tokens.drift.test.ts, so a CRLF
+# rewrite would fail that test on every Windows clone with a whitespace-only
+# diff that reads like a real token change. Pin line endings to LF.
+* text=auto eol=lf

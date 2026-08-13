@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "tsc -b --noEmit && vite build",
+    "build": "node scripts/gen-tokens.mjs --check && tsc -b --noEmit && vite build",
+    "gen:tokens": "node scripts/gen-tokens.mjs",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
