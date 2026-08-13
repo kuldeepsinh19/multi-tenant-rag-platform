@@ -225,3 +225,51 @@ describe("ChatPanel", () => {
     });
   });
 });
+
+describe("ChatPanel conversation continuity", () => {
+  it("adopts the server's conversation_id and sends it on the next turn", async () => {
+    // Before the backend returned conversation_id the client had no way to learn it, so
+    // every turn silently started a new thread and follow-up questions lost their context.
+    streamChatMock.mockImplementation(
+      async (_payload: unknown, onEvent: (event: ChatStreamEvent) => void) => {
+        onEvent({ token: "ok" });
+        onEvent({ done: true, citations: [], conversation_id: "conv-abc" });
+      },
+    );
+
+    render(<ChatPanel businessId="biz-1" />);
+
+    sendMessage("first");
+    await waitFor(() => expect(streamChatMock).toHaveBeenCalledTimes(1));
+    expect(streamChatMock.mock.calls[0]?.[0]).toMatchObject({ conversation_id: undefined });
+
+    sendMessage("second");
+    await waitFor(() => expect(streamChatMock).toHaveBeenCalledTimes(2));
+    expect(streamChatMock.mock.calls[1]?.[0]).toMatchObject({ conversation_id: "conv-abc" });
+  });
+
+  it("keeps the existing conversation_id when a blocked turn returns null", async () => {
+    // A guardrail-blocked turn persists nothing and sends conversation_id: null.
+    // Overwriting the stored id with null would drop the user out of their own thread.
+    streamChatMock.mockImplementation(
+      async (_payload: unknown, onEvent: (event: ChatStreamEvent) => void) => {
+        onEvent({ done: true, citations: [], conversation_id: "conv-xyz" });
+      },
+    );
+    render(<ChatPanel businessId="biz-1" />);
+    sendMessage("first");
+    await waitFor(() => expect(streamChatMock).toHaveBeenCalledTimes(1));
+
+    streamChatMock.mockImplementation(
+      async (_payload: unknown, onEvent: (event: ChatStreamEvent) => void) => {
+        onEvent({ done: true, citations: [], conversation_id: null });
+      },
+    );
+    sendMessage("blocked");
+    await waitFor(() => expect(streamChatMock).toHaveBeenCalledTimes(2));
+
+    sendMessage("third");
+    await waitFor(() => expect(streamChatMock).toHaveBeenCalledTimes(3));
+    expect(streamChatMock.mock.calls[2]?.[0]).toMatchObject({ conversation_id: "conv-xyz" });
+  });
+});

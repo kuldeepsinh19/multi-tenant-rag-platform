@@ -15,6 +15,7 @@ from src.businesses.schemas import (
     AdminInvite,
     BusinessCreate,
     BusinessOut,
+    BusinessStatusUpdate,
     WidgetKeyCreate,
     WidgetKeyOut,
 )
@@ -24,6 +25,7 @@ from src.businesses.service import (
     get_business,
     invite_admin,
     list_businesses,
+    set_business_status,
 )
 from src.core.db import get_db
 from src.core.exceptions import NotAuthorized
@@ -70,6 +72,20 @@ async def get_business_endpoint(
 ) -> BusinessOut:
     ensure_same_business(business_id, user)
     business = await get_business(db, business_id)
+    return BusinessOut.model_validate(business)
+
+
+@router.patch("/{business_id}", response_model=BusinessOut)
+async def set_business_status_endpoint(
+    business_id: UUID,
+    payload: BusinessStatusUpdate,
+    _: User = Depends(require_super_admin),
+    db: AsyncSession = Depends(get_db),
+) -> BusinessOut:
+    """Suspend or reactivate a tenant. Deliberately super-admin only — a business_admin
+    must not be able to lift a suspension on their own business, which would make the
+    spending guard self-serve."""
+    business = await set_business_status(db, business_id, payload.status)
     return BusinessOut.model_validate(business)
 
 

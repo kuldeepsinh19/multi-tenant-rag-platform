@@ -69,6 +69,30 @@ async def ensure_business_active(db: AsyncSession, business_id: UUID) -> None:
         raise BusinessSuspended()
 
 
+async def set_business_status(
+    db: AsyncSession, business_id: UUID, status: BusinessStatus
+) -> Business:
+    """Suspend or reactivate a tenant. This is the control that `ensure_business_active`
+    enforces — without it the suspension path is unreachable and a tenant can never be
+    stopped from spending. Idempotent: setting the current status is a no-op that still
+    returns the business."""
+    business = await get_business(db, business_id)
+    if business.status == status:
+        return business
+
+    previous = business.status
+    business.status = status
+    await db.commit()
+    await db.refresh(business)
+    logger.info(
+        "business_status_changed",
+        business_id=str(business_id),
+        previous_status=previous.value,
+        new_status=status.value,
+    )
+    return business
+
+
 async def invite_admin(db: AsyncSession, business_id: UUID, email: str, password: str) -> User:
     """Ensures the target business exists, then creates a business_admin User scoped
     to it."""

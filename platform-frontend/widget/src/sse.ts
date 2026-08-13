@@ -21,6 +21,9 @@ export interface ChatTokenEvent {
 export interface ChatDoneEvent {
   done: true;
   citations: Citation[];
+  /** Server-assigned conversation id; null on a guardrail-blocked turn (nothing
+   * is persisted for one), so callers must not overwrite an existing id with null. */
+  conversation_id?: string | null;
   escalated?: boolean;
 }
 

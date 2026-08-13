@@ -180,3 +180,133 @@ async def test_business_admin_can_create_own_widget_key(
     assert body["allowed_domains"] == ["https://example.com"]
     assert body["is_active"] is True
     assert body["public_key"]
+
+
+# --- Tenant suspension -----------------------------------------------------------------
+# `ensure_business_active` has always guarded chat and uploads, but until PATCH existed
+# there was no way to actually suspend a tenant — the guard was unreachable. These cover
+# the control itself and, critically, that a business_admin cannot lift their own
+# suspension (which would make the spending guard self-serve).
+
+
+async def _make_business_with_admin(
+    client: AsyncClient, super_token: str
+) -> tuple[str, str, str]:
+    """Returns (business_id, admin_email, admin_password)."""
+    business_resp = await client.post(
+        "/businesses",
+        json={"name": f"Suspend Biz {uuid4().hex[:8]}"},
+        headers=_auth_headers(super_token),
+    )
+    assert business_resp.status_code == 201
+    business_id: str = business_resp.json()["id"]
+
+    admin_email = f"suspend-admin-{uuid4().hex[:8]}@example.com"
+    admin_password = "biz-admin-pass"
+    invite = await client.post(
+        f"/businesses/{business_id}/admins",
+        json={"email": admin_email, "password": admin_password},
+        headers=_auth_headers(super_token),
+    )
+    assert invite.status_code == 201
+    return business_id, admin_email, admin_password
+
+
+async def test_super_admin_can_suspend_and_reactivate_a_business(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    password = "super-secret-pass"
+    admin = await _create_super_admin(db_session, password)
+    token = await _login(client, admin.email, password)
+    business_id, _, _ = await _make_business_with_admin(client, token)
+
+    suspended = await client.patch(
+        f"/businesses/{business_id}",
+        json={"status": "suspended"},
+        headers=_auth_headers(token),
+    )
+    assert suspended.status_code == 200
+    assert suspended.json()["status"] == "suspended"
+
+    reactivated = await client.patch(
+        f"/businesses/{business_id}",
+        json={"status": "active"},
+        headers=_auth_headers(token),
+    )
+    assert reactivated.status_code == 200
+    assert reactivated.json()["status"] == "active"
+
+
+async def test_setting_the_same_status_is_idempotent(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    password = "super-secret-pass"
+    admin = await _create_super_admin(db_session, password)
+    token = await _login(client, admin.email, password)
+    business_id, _, _ = await _make_business_with_admin(client, token)
+
+    first = await client.patch(
+        f"/businesses/{business_id}", json={"status": "active"}, headers=_auth_headers(token)
+    )
+    assert first.status_code == 200
+    assert first.json()["status"] == "active"
+
+
+async def test_business_admin_cannot_change_their_own_status(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    """The authorization decision that matters: a suspended tenant must not be able to
+    un-suspend itself and resume spending."""
+    password = "super-secret-pass"
+    admin = await _create_super_admin(db_session, password)
+    token = await _login(client, admin.email, password)
+    business_id, admin_email, admin_password = await _make_business_with_admin(client, token)
+
+    suspend = await client.patch(
+        f"/businesses/{business_id}",
+        json={"status": "suspended"},
+        headers=_auth_headers(token),
+    )
+    assert suspend.status_code == 200
+
+    biz_token = await _login(client, admin_email, admin_password)
+    response = await client.patch(
+        f"/businesses/{business_id}",
+        json={"status": "active"},
+        headers=_auth_headers(biz_token),
+    )
+
+    assert response.status_code == 403
+
+
+async def test_suspending_rejects_an_unknown_status(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    password = "super-secret-pass"
+    admin = await _create_super_admin(db_session, password)
+    token = await _login(client, admin.email, password)
+    business_id, _, _ = await _make_business_with_admin(client, token)
+
+    response = await client.patch(
+        f"/businesses/{business_id}",
+        json={"status": "deleted"},
+        headers=_auth_headers(token),
+    )
+
+    assert response.status_code == 422
+
+
+async def test_patching_an_unknown_business_is_not_found(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    password = "super-secret-pass"
+    admin = await _create_super_admin(db_session, password)
+    token = await _login(client, admin.email, password)
+
+    response = await client.patch(
+        f"/businesses/{uuid4()}",
+        json={"status": "suspended"},
+        headers=_auth_headers(token),
+    )
+
+    assert response.status_code == 404

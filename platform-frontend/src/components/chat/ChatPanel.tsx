@@ -45,6 +45,11 @@ function ChatPanelInner({ businessId }: Props) {
         { business_id: businessId, message, conversation_id: conversationIdRef.current },
         (event) => {
           if (isDoneEvent(event)) {
+            // Adopt the server's conversation id so the next turn continues this thread.
+            // Guarded: a blocked turn sends null, which must not clear an existing id.
+            if (event.conversation_id) {
+              conversationIdRef.current = event.conversation_id;
+            }
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantId

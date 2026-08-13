@@ -18,11 +18,17 @@ export interface ChatDoneEvent {
   done: true;
   citations: Citation[];
   /**
-   * Not present anywhere in the current backend contract. Added defensively
-   * so the UI can render a distinct "escalated to human" state the moment
-   * the backend starts sending it, without us guessing at trigger logic
-   * today (e.g. empty citations is a normal ungrounded-but-fine answer, not
-   * an escalation — we do not infer escalation from it).
+   * Id of the conversation this turn belongs to. The server creates the
+   * conversation, so this frame is the only way the client can learn the id
+   * and continue the same thread on the next turn. Null on a guardrail-blocked
+   * turn (nothing is persisted for one) — callers must keep their existing id
+   * rather than overwrite it with null.
+   */
+  conversation_id?: string | null;
+  /**
+   * True when the agent gave up and escalated to a human, so the UI can render
+   * a distinct state. Empty citations alone is a normal ungrounded-but-fine
+   * answer, not an escalation — we do not infer escalation from it.
    */
   escalated?: boolean;
 }

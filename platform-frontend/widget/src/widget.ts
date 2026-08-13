@@ -504,6 +504,11 @@ export function mountWidget(config: WidgetChatConfig): void {
     try {
       await streamWidgetChat(config, message, conversationId, (event) => {
         if (isDoneEvent(event)) {
+          // Adopt the server's conversation id so the next turn continues this thread.
+          // Guarded: a blocked turn sends null, which must not clear an existing id.
+          if (event.conversation_id) {
+            conversationId = event.conversation_id;
+          }
           const current = messages[assistantIndex];
           if (current) {
             messages = messages.map((msg, index) =>

@@ -10,6 +10,13 @@ class BusinessCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200)
 
 
+class BusinessStatusUpdate(BaseModel):
+    """Body for PATCH /businesses/{id}. An enum field, so an unknown status is a clean 422
+    at the edge rather than a bad value reaching the tenant guard."""
+
+    status: BusinessStatus
+
+
 class BusinessOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

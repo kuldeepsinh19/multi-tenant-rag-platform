@@ -253,15 +253,18 @@ async def test_done_frame_shape_matches_the_client_contract(
     db_session: AsyncSession, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     # The dashboard's ChatDoneEvent and the widget's copy both read exactly
-    # {done, citations:[{doc_id, title}]}. Pinned here so the wire contract
-    # cannot drift out from under either client.
+    # {done, citations:[{doc_id, title}], conversation_id, escalated}. Pinned here so the
+    # wire contract cannot drift out from under either client — adding a key is a client
+    # change, and removing one silently breaks multi-turn or the escalation banner.
     monkeypatch.setattr("src.chat.service.run_agent", _agent_runner("ok", []))
 
     resp = await _post_chat(db_session, {"message": "hi"})
 
     done = _done_frame(_parse_sse(resp.text))
-    assert set(done) == {"done", "citations"}
+    assert set(done) == {"done", "citations", "conversation_id", "escalated"}
     assert isinstance(done["citations"], list)
+    assert isinstance(done["conversation_id"], str)
+    assert isinstance(done["escalated"], bool)
 
 
 async def test_every_frame_is_valid_json_on_a_single_line(

@@ -8,7 +8,15 @@ the client still gets a streaming UX.
 
 SSE shape emitted (exactly, matching the frontend contract):
     data: {"token": "..."}\\n\\n           (repeated per token)
-    data: {"done": true, "citations": [{"doc_id": "...", "title": "..."}]}\\n\\n
+    data: {"done": true, "citations": [{"doc_id": "...", "title": "..."}],
+           "conversation_id": "...", "escalated": false}\\n\\n
+
+`conversation_id` is what makes a multi-turn conversation possible: the client has no other
+way to learn the id of a conversation the server created, so without it every turn would
+start a fresh thread. `escalated` surfaces `AgentResult.escalated` so the UI can render the
+"escalated to a human" state. On a guardrail-blocked turn no conversation is persisted (an
+unsafe request must not create tenant state), so `conversation_id` is null there — clients
+must keep their existing id rather than overwrite it with null.
 """
 
 import json
@@ -102,7 +110,10 @@ async def stream_turn(
     except GuardrailBlocked as exc:
         logger.info("chat_input_blocked", business_id=str(business_id), detail=exc.detail)
         yield _sse({"token": exc.client_message})
-        yield _sse({"done": True, "citations": []})
+        # No conversation is created for a blocked turn, so there is no id to hand back.
+        yield _sse(
+            {"done": True, "citations": [], "conversation_id": None, "escalated": False}
+        )
         return
 
     conversation = await get_or_create_conversation(
@@ -146,7 +157,14 @@ async def stream_turn(
     # Stream the already-verified answer token-by-token, then the citations done-event.
     for token in _tokenize(result.answer):
         yield _sse({"token": token})
-    yield _sse({"done": True, "citations": [c.model_dump() for c in citations_payload]})
+    yield _sse(
+        {
+            "done": True,
+            "citations": [c.model_dump() for c in citations_payload],
+            "conversation_id": str(conversation.id),
+            "escalated": result.escalated,
+        }
+    )
 
 
 async def _build_citations(db: AsyncSession, doc_ids: list[str]) -> list[Citation]:
