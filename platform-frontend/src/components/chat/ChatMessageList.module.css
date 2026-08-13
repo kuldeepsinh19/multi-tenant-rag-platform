@@ -1,0 +1,155 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  /* Relative cap: the old flat 440px swallowed most of a short viewport. */
+  max-height: min(60vh, 440px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.message {
+  composes: messageIn from "../../styles/animations.module.css";
+  position: relative;
+  /* Roomier on mobile where 78% left an awkward dead gutter. */
+  max-width: 88%;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-xl);
+  font-size: var(--fs-base);
+  line-height: var(--lh-normal);
+  overflow-wrap: anywhere;
+}
+@media (min-width: 48rem) {
+  .message {
+    max-width: 78%;
+  }
+}
+
+.role {
+  display: block;
+  margin-bottom: var(--sp-1);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  opacity: 0.75;
+}
+
+.user {
+  align-self: flex-end;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-bottom-right-radius: var(--r-xs);
+  box-shadow: var(--e-accent);
+}
+
+.assistant {
+  align-self: flex-start;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: var(--r-xs);
+}
+
+/* ---- Typing indicator ---------------------------------------------------- */
+
+.generating {
+  composes: messageIn from "../../styles/animations.module.css";
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  border-bottom-left-radius: var(--r-xs);
+}
+
+.dot {
+  composes: dot from "../../styles/animations.module.css";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.dot:nth-child(2) {
+  animation-delay: 160ms;
+}
+.dot:nth-child(3) {
+  animation-delay: 320ms;
+}
+
+/* With motion reduced the dots stop bouncing, so give them a steady visible
+   state rather than leaving them frozen mid-fade. */
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    opacity: 1;
+  }
+}
+
+/* ---- Escalation notice ---------------------------------------------------- */
+
+/* Carries role="status" for the right semantics. Previously that role alone
+   pulled in the global green success block, which then fought this rule — two
+   backgrounds resolved only by source order. */
+.escalated {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-sm);
+  color: var(--warning);
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  border-radius: var(--r-sm);
+}
+
+/* ---- Citations ----------------------------------------------------------- */
+
+.citations {
+  margin-top: var(--sp-3);
+}
+
+.citationList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.citationsLabel {
+  margin-bottom: var(--sp-1);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-subtle);
+}
+
+.citation {
+  padding: 2px var(--sp-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+}
+
+/* Inside a user bubble the chips sit on the accent fill, so they need their own
+   translucent treatment to stay legible. */
+.user .citationsLabel {
+  color: currentColor;
+  opacity: 0.8;
+}
+.user .citation {
+  color: currentColor;
+  background: color-mix(in srgb, var(--accent-ink) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent-ink) 28%, transparent);
+}

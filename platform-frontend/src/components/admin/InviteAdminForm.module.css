@@ -1,0 +1,18 @@
+.heading {
+  margin-bottom: var(--sp-4);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-4);
+}
+@media (min-width: 30rem) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.action {
+  margin-top: var(--sp-4);
+}

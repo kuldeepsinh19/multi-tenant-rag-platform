@@ -1,0 +1,24 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-3);
+}
+
+.snippet {
+  /* The snippet is one long line; wrap it instead of forcing a scrollbar. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: var(--lh-snug);
+}
+
+.copy {
+  align-self: flex-start;
+}
+
+/* Confirmation pop on the checkmark — a short, non-looping cue. */
+.pop {
+  composes: pop from "../../styles/animations.module.css";
+  display: inline-flex;
+  color: var(--success);
+}

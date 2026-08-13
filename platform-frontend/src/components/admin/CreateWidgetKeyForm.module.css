@@ -1,0 +1,12 @@
+.heading {
+  margin-bottom: var(--sp-4);
+}
+
+.action {
+  margin-top: var(--sp-4);
+}
+
+/* A public key is long and must wrap rather than force the card to scroll. */
+.key {
+  overflow-wrap: anywhere;
+}

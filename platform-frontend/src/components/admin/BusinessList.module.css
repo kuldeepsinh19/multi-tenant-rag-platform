@@ -1,0 +1,103 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  /* Relative cap instead of a hard 380px, so a short viewport isn't consumed by
+     the list. */
+  max-height: min(50vh, 380px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: var(--sp-1);
+}
+
+/* Grid, not flex: below 30rem the badges drop to their own row beneath the name
+   instead of squeezing it to a few characters. */
+.item {
+  composes: riseFast from "../../styles/animations.module.css";
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-2);
+}
+@media (min-width: 30rem) {
+  .item {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-width: 0;
+  padding: var(--sp-2) var(--sp-3);
+  font: inherit;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-medium);
+  text-align: left;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+.trigger:hover {
+  background: var(--surface-3);
+  border-color: var(--border-strong);
+  transform: translate3d(2px, 0, 0);
+}
+.trigger:active {
+  transform: translate3d(0, 0, 0) scale(0.995);
+}
+
+.avatar {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  transition:
+    background var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out);
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Selected row. Selection is conveyed by the accent fill AND the avatar mark
+   changing — plus aria-pressed for assistive tech — never by colour alone. */
+.trigger[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+}
+.trigger[aria-pressed="true"] .avatar {
+  background: var(--accent-grad);
+  border-color: transparent;
+}
+
+.tags {
+  display: inline-flex;
+  gap: var(--sp-1);
+  flex-wrap: wrap;
+  /* Aligns with the name text, not the avatar, on the stacked mobile layout. */
+  padding-left: calc(30px + var(--sp-3) + var(--sp-3));
+}
+@media (min-width: 30rem) {
+  .tags {
+    padding-left: 0;
+  }
+}

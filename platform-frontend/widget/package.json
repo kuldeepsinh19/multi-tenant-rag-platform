@@ -1,0 +1,19 @@
+{
+  "name": "platform-widget",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b --noEmit && vite build",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "dompurify": "^3.1.7"
+  },
+  "devDependencies": {
+    "@types/dompurify": "^3.0.5",
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.9"
+  }
+}

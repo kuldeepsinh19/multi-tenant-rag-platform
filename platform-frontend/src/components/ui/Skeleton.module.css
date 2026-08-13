@@ -1,0 +1,50 @@
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+@media (min-width: 30rem) {
+  .tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 48rem) {
+  .tiles {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+.block {
+  composes: shimmer from "../../styles/animations.module.css";
+  border-radius: var(--r-md);
+  background:
+    linear-gradient(
+      90deg,
+      var(--skeleton-base) 25%,
+      var(--skeleton-sheen) 37%,
+      var(--skeleton-base) 63%
+    );
+  background-size: 200% 100%;
+}
+
+.row {
+  height: 46px;
+}
+
+.tile {
+  height: 84px;
+}
+
+/* With motion reduced the shimmer is frozen; give the block a visible resting
+   tone so it still reads as a placeholder rather than an empty box. */
+@media (prefers-reduced-motion: reduce) {
+  .block {
+    background: var(--skeleton-base);
+  }
+}

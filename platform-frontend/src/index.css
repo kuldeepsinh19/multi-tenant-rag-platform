@@ -1,0 +1,11 @@
+/* Global stylesheet entry point.
+
+   The design system now lives in src/styles/ as layered files, and per-component
+   styling lives in colocated *.module.css files next to each component (per
+   react-frontend-standards' "Colocate" rule). This file only wires up the two
+   global layers, so main.tsx's `import "@/index.css"` keeps working unchanged.
+
+   Order matters: tokens must be defined before base consumes them. */
+
+@import "./styles/tokens.css";
+@import "./styles/base.css";

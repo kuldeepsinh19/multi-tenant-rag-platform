@@ -1,0 +1,50 @@
+.banner {
+  composes: banner from "../../styles/animations.module.css";
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-base);
+  border: 1px solid;
+  border-radius: var(--r-md);
+}
+
+/* Below 30rem the Retry button drops beneath the text rather than crushing it. */
+@media (max-width: 29.99rem) {
+  .banner {
+    flex-wrap: wrap;
+  }
+  .banner button {
+    margin-left: auto;
+  }
+}
+
+.icon {
+  display: inline-flex;
+  flex: none;
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Distinct tone per failure mode — a rate-limit is not an error, and shouldn't
+   read as one. */
+.rateLimited {
+  color: var(--warning);
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+}
+
+.unavailable {
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.error {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+}

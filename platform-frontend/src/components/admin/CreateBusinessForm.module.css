@@ -1,0 +1,23 @@
+/* Stacks on mobile, becomes an input + button row once there is room. The
+   button aligns to the input's baseline, not the label's. */
+.inline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+@media (min-width: 30rem) {
+  .inline {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.action {
+  min-height: 38px;
+  flex: none;
+}

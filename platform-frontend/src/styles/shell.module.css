@@ -1,0 +1,126 @@
+/* ============================================================================
+   Dashboard app shell — shared by SuperAdminDashboard and BusinessAdminDashboard.
+
+   Colocated per-component modules cover component internals; this file exists
+   because both dashboard pages are genuinely the same shell, and duplicating it
+   twice is how the two headers drifted apart in the first place.
+
+   Mobile-first: base rules target small screens, and each @media block only
+   ever adds. The previous stylesheet had no responsive rules at all.
+   ============================================================================ */
+
+.page {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter) var(--sp-16);
+}
+
+/* ---- Sticky top bar ------------------------------------------------------- */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  /* Bleed to the viewport edges through the page gutter. */
+  margin: 0 calc(var(--gutter) * -1) var(--sp-4);
+  padding: var(--sp-3) var(--gutter);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  /* Lets the title truncate instead of shoving the actions off-screen. */
+  min-width: 0;
+}
+
+.brandTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Decorative brand mark. Purely presentational, so it stays a pseudo-free empty
+   span with aria-hidden at the call site. */
+.mark {
+  display: inline-flex;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-sm);
+  background: var(--accent-grad);
+  box-shadow: var(--e-accent);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: none;
+}
+
+/* Below 30rem the theme toggle plus "Log out" crowds the title, so the label
+   collapses to its icon and the accessible name is carried by .sr-only text. */
+.logoutLabel {
+  display: none;
+}
+@media (min-width: 30rem) {
+  .logoutLabel {
+    display: inline;
+  }
+}
+
+/* ---- Content ------------------------------------------------------------- */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+.content:focus {
+  /* Skip-link target: it takes focus programmatically, so suppress the ring
+     that would otherwise outline the entire page. */
+  outline: none;
+}
+
+/* Staggered entrance. nth-of-type counts <section> only, so the cards cascade
+   in document order without any inline style or JS index. */
+.section {
+  composes: rise from "./animations.module.css";
+}
+.section:nth-of-type(1) {
+  animation-delay: 40ms;
+}
+.section:nth-of-type(2) {
+  animation-delay: 100ms;
+}
+.section:nth-of-type(3) {
+  animation-delay: 160ms;
+}
+.section:nth-of-type(4) {
+  animation-delay: 220ms;
+}
+.section:nth-of-type(n + 5) {
+  animation-delay: 280ms;
+}
+
+/* Vertical rhythm between blocks inside one card. */
+.cardStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.divider {
+  height: 1px;
+  margin: var(--sp-1) 0;
+  background: var(--border);
+  border: 0;
+}

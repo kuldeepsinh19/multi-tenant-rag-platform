@@ -1,0 +1,78 @@
+.viewport {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  /* Horizontal padding is the fix for the old bug where a 400px-max card sat
+     flush against both edges on a narrow phone (body had no gutter). */
+  padding: var(--sp-6) var(--sp-4);
+}
+
+.themeSlot {
+  /* Sits above the card in flow on mobile, pinned to the corner once there's
+     room, so it never overlaps the card on a short screen. */
+  align-self: center;
+  margin-bottom: var(--sp-5);
+}
+@media (min-width: 48rem) {
+  .themeSlot {
+    position: fixed;
+    top: var(--sp-5);
+    right: var(--sp-5);
+    margin-bottom: 0;
+  }
+}
+
+.card {
+  composes: rise from "../styles/animations.module.css";
+  width: 100%;
+  max-width: 400px;
+  padding: var(--sp-8) var(--sp-6);
+  box-shadow: var(--e-4);
+  text-align: center;
+}
+
+.mark {
+  display: block;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--accent-grad);
+  box-shadow: var(--e-accent);
+}
+
+.title {
+  font-size: var(--fs-xl);
+  margin-bottom: var(--sp-1);
+}
+
+.subtitle {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin-top: var(--sp-6);
+  /* Labels and inputs read left-aligned even though the header is centred. */
+  text-align: left;
+}
+
+.submit {
+  margin-top: var(--sp-1);
+  min-height: 42px;
+}
+
+.spinner {
+  composes: spin from "../styles/animations.module.css";
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+}

@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Env files (never commit secrets — see .env.example in each repo)
+.env
+.env.*
+!.env.example
+.env.local
+.env.*.local
+
+# Runtime-uploaded tenant documents — user data, never committed.
+# The directory itself is kept via .gitkeep so the container bind-mount works.
+platform-backend/uploads/*
+!platform-backend/uploads/.gitkeep
+
+# Local Claude Code state (machine-specific paths, scheduling locks).
+# NOTE: .claude/skills/ IS committed on purpose — those are the project's
+# engineering standards, not local state.
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker
+postgres_data/

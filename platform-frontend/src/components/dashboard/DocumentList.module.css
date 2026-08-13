@@ -1,0 +1,72 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* Explicit named grid areas so the failure message gets a real row of its own
+   rather than being wedged into a flex line.
+
+   Mobile: filename on top, then status + delete side by side, then the error.
+   ≥30rem: one row of filename | status | delete, with the error spanning under. */
+.item {
+  composes: riseFast from "../../styles/animations.module.css";
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "name name"
+    "status action"
+    "error error";
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  padding: var(--sp-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition:
+    border-color var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out);
+}
+.item:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-3);
+}
+
+@media (min-width: 30rem) {
+  .item {
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas:
+      "name status action"
+      "error error error";
+  }
+}
+
+.name {
+  grid-area: name;
+  min-width: 0;
+  font-weight: var(--fw-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status {
+  grid-area: status;
+  justify-self: start;
+}
+
+.delete {
+  grid-area: action;
+  justify-self: end;
+}
+
+.error {
+  grid-area: error;
+  padding-top: var(--sp-1);
+  font-size: var(--fs-sm);
+  color: var(--danger);
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,335 @@
+/* ============================================================================
+   Shared primitives — the explicit class API that replaces the old
+   element-keyed design system.
+
+   Previously every bare `<button>` was a gradient CTA, and secondary looks were
+   clawed back with descendant hacks (`header button`, `.document-list button`,
+   `.chat-composer__actions button + button`). A button's appearance is now
+   stated at the call site: <button className={cx(ui.btn, ui.btnGhost)}>.
+
+   Component-specific styling lives in each component's own *.module.css; this
+   file is only for genuinely shared, reusable pieces.
+   ============================================================================ */
+
+/* ---- Buttons -------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  min-height: 38px;
+  font: inherit;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  /* Only transform/opacity/shadow animate — all compositor-friendly. */
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
+}
+.btn:hover:not(:disabled) {
+  transform: translate3d(0, -1px, 0);
+}
+.btn:active:not(:disabled) {
+  transform: translate3d(0, 0, 0) scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Primary — solid accent. Ink colour is theme-inverted so the label clears AA
+   in both themes (dark: dark ink on light teal; light: white on deep teal). */
+.btnPrimary {
+  color: var(--accent-ink);
+  background: var(--accent);
+  box-shadow: var(--e-accent);
+}
+.btnPrimary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+/* Ghost — the default for secondary actions. */
+.btnGhost {
+  color: var(--text);
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+.btnGhost:hover:not(:disabled) {
+  background: var(--surface-3);
+  border-color: var(--border-strong);
+}
+
+/* Danger — destructive, outlined so it never competes with the primary CTA. */
+.btnDanger {
+  color: var(--danger);
+  background: transparent;
+  border-color: var(--danger-border);
+}
+.btnDanger:hover:not(:disabled) {
+  background: var(--danger-bg);
+}
+
+/* Icon-only. Sized to the minimum comfortable touch target. */
+.btnIcon {
+  padding: 0;
+  width: var(--tap);
+  height: var(--tap);
+  min-height: var(--tap);
+  border-radius: var(--r-md);
+}
+@media (min-width: 48rem) {
+  .btnIcon {
+    width: 34px;
+    height: 34px;
+    min-height: 34px;
+  }
+}
+
+.btnSm {
+  padding: var(--sp-1) var(--sp-3);
+  min-height: 30px;
+  font-size: var(--fs-sm);
+}
+
+.btnBlock {
+  width: 100%;
+}
+
+.btn svg {
+  flex: none;
+}
+
+/* ---- Card --------------------------------------------------------------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--e-2);
+  padding: var(--sp-5);
+}
+@media (min-width: 48rem) {
+  .card {
+    padding: var(--sp-6);
+  }
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ---- Form fields -------------------------------------------------------- */
+
+/* A field owns only its own internal label/control spacing. Gaps *between*
+   fields belong to the container (a flex/grid gap), so a form's layout is stated
+   in one place and can't be double-applied. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+}
+
+.input {
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  min-height: 38px;
+  font: inherit;
+  font-size: var(--fs-base);
+  color: var(--text);
+  background: var(--surface-2);
+  /* --border-control, not --border: this is a control boundary and must clear
+     3:1 per WCAG 1.4.11. */
+  border: 1px solid var(--border-control);
+  border-radius: var(--r-md);
+  transition:
+    border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out);
+}
+.input::placeholder {
+  color: var(--text-subtle);
+}
+.input:focus-visible {
+  outline: none;
+  background: var(--surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 64px;
+  line-height: var(--lh-normal);
+}
+
+.inputMono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+}
+
+.fileInput {
+  width: 100%;
+  padding: var(--sp-1) var(--sp-2);
+  font: inherit;
+  font-size: var(--fs-base);
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 1px dashed var(--border-control);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition:
+    border-color var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out);
+}
+.fileInput:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.fileInput::file-selector-button {
+  margin-right: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease-out);
+}
+.fileInput::file-selector-button:hover {
+  background: var(--border-strong);
+}
+
+.hint {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+/* ---- Badges / pills ----------------------------------------------------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 3px var(--sp-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-transform: capitalize;
+  white-space: nowrap;
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+/* The dot is decorative reinforcement only — every badge also carries a text
+   label, so status is never conveyed by colour alone. */
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.badgeSuccess {
+  color: var(--success);
+  background: var(--success-bg);
+  border-color: var(--success-border);
+}
+.badgeWarning {
+  color: var(--warning);
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+}
+.badgeDanger {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+}
+.badgeInfo {
+  color: var(--info);
+  background: var(--info-bg);
+  border-color: var(--info-border);
+}
+.badgeNeutral::before {
+  display: none;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px var(--sp-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+}
+
+/* ---- Section label ------------------------------------------------------ */
+
+.overline {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-subtle);
+}
+
+/* ---- Layout helpers ----------------------------------------------------- */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

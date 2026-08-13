@@ -1,0 +1,134 @@
+/* ============================================================================
+   Shared animations.
+
+   Why these live in a module rather than the global base layer: Vite's CSS
+   Modules pipeline hashes every animation-name it encounters, whether or not a
+   matching @keyframes is declared locally. A module that referenced a globally
+   declared `riseIn` therefore compiled to `riseIn_a1b2c3_1` — a name nothing
+   defines — and silently did not animate. Verified against the built CSS.
+
+   Keeping the @keyframes and the rule that uses it in one file, then pulling it
+   in with `composes`, gives a single definition per animation with no global
+   leakage. Consumers can still override individual longhands (notably
+   animation-delay) from their own module, because a selector like
+   `.item:nth-child(2)` outranks the composed single-class rule.
+
+   All animations move only transform/opacity, so they stay on the compositor,
+   and every one is neutralized by the reduced-motion block in base.css.
+   ============================================================================ */
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes bannerIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dotBounce {
+  0%,
+  80%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.45;
+  }
+  40% {
+    transform: translate3d(0, -4px, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Page- and card-level entrance. */
+.rise {
+  animation: riseIn var(--dur-slow) var(--ease-out) both;
+}
+
+/* Same motion, quicker — for list rows, which appear many at a time. */
+.riseFast {
+  animation: riseIn var(--dur) var(--ease-out) both;
+}
+
+/* Chat bubble entrance. */
+.messageIn {
+  animation: messageIn var(--dur) var(--ease-out) both;
+}
+
+/* Inline status lines and chat banners drop in from above. */
+.banner {
+  animation: bannerIn var(--dur) var(--ease-out) both;
+}
+
+/* One-shot confirmation cue (e.g. the copied-to-clipboard checkmark). */
+.pop {
+  animation: popIn var(--dur) var(--ease-spring) both;
+}
+
+/* Typing indicator dot. Per-dot delays are set by the consumer. */
+.dot {
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+
+/* Skeleton sheen. */
+.shimmer {
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* Pending-action spinner. */
+.spin {
+  animation: spin 640ms linear infinite;
+}

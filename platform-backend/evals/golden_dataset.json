@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "description": "SEED golden dataset for retrieval + generation evals. This is scaffolding, NOT a production golden set. Per llm-evals-standards a real golden set is 50-200 hand-verified Q/A+citation pairs drawn from ACTUAL usage. Grow this from real production failures: every wrong answer or bad citation becomes a permanent case here so the system can never regress on the same bug twice.",
+    "fictional_business": "Acme Cloud Storage — a fictional SaaS whose docs cover pricing, security, and account management. Used only so the seed rows are concrete; replace with your tenant's real docs.",
+    "schema": "list of {question, expected_answer, expected_doc_ids}. expected_doc_ids are the document UUIDs/ids that MUST appear among retrieved citations for the answer to be considered grounded.",
+    "seed": true
+  },
+  "cases": [
+    {
+      "question": "What is the maximum file size I can upload on the free plan?",
+      "expected_answer": "On the free plan the maximum single-file upload size is 2 GB.",
+      "expected_doc_ids": ["acme-pricing-001"]
+    },
+    {
+      "question": "How much storage does the Pro plan include?",
+      "expected_answer": "The Pro plan includes 1 TB of storage.",
+      "expected_doc_ids": ["acme-pricing-001"]
+    },
+    {
+      "question": "Is data encrypted at rest?",
+      "expected_answer": "Yes. All stored data is encrypted at rest using AES-256.",
+      "expected_doc_ids": ["acme-security-002"]
+    },
+    {
+      "question": "Does Acme support single sign-on?",
+      "expected_answer": "Yes, SSO via SAML 2.0 is available on the Business and Enterprise plans.",
+      "expected_doc_ids": ["acme-security-002", "acme-pricing-001"]
+    },
+    {
+      "question": "How do I reset my account password?",
+      "expected_answer": "Use the 'Forgot password' link on the sign-in page; a reset link is emailed to your registered address and expires after 30 minutes.",
+      "expected_doc_ids": ["acme-account-003"]
+    },
+    {
+      "question": "How long are deleted files retained before permanent deletion?",
+      "expected_answer": "Deleted files are kept in the trash for 30 days before they are permanently removed.",
+      "expected_doc_ids": ["acme-account-003"]
+    },
+    {
+      "question": "Can I get a refund if I cancel mid-billing-cycle?",
+      "expected_answer": "Cancellations take effect at the end of the current billing period; Acme does not issue prorated refunds for partial periods.",
+      "expected_doc_ids": ["acme-pricing-001"]
+    },
+    {
+      "question": "Which regions can I choose to store my data in?",
+      "expected_answer": "Data residency can be set to the US, EU, or APAC regions on Business and Enterprise plans.",
+      "expected_doc_ids": ["acme-security-002"]
+    }
+  ]
+}

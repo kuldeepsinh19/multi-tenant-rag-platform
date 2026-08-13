@@ -1,0 +1,7 @@
+node_modules
+dist
+widget/node_modules
+widget/dist
+.env.local
+.claude
+*.md

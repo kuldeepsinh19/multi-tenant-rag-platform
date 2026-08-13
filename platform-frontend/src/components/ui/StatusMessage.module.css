@@ -1,0 +1,56 @@
+.message {
+  composes: banner from "../../styles/animations.module.css";
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-sm);
+  border: 1px solid;
+  border-radius: var(--r-sm);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  /* Nudge the icon onto the first text line's optical centre. */
+  margin-top: 2px;
+}
+
+.body {
+  min-width: 0;
+  /* Long API error strings and keys must wrap rather than widen the card. */
+  overflow-wrap: anywhere;
+}
+
+.error {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+}
+
+.success {
+  color: var(--success);
+  background: var(--success-bg);
+  border-color: var(--success-border);
+}
+
+.info {
+  color: var(--info);
+  background: var(--info-bg);
+  border-color: var(--info-border);
+}
+
+.warning {
+  color: var(--warning);
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+}
+
+/* Code inside a status line (e.g. a freshly minted public key) should read as
+   content, not inherit the tinted status colour. */
+.message code {
+  color: var(--text);
+  background: var(--surface-2);
+}
