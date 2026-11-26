@@ -231,6 +231,7 @@ The widget cannot import dashboard code, so its design tokens are generated from
 
 - Backend lint/type-check: `docker compose exec api ruff check src && docker compose exec api mypy src`
 - Frontend lint/type-check/build: `cd platform-frontend && npm run lint && npm run typecheck && npm run build`
+- Frontend formatting: `npm run format` (Prettier, writes changes in place)
 - Both `src/` directories are bind-mounted into their containers for live reload during
   development.
 
