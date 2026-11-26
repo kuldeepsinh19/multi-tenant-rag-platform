@@ -223,6 +223,10 @@ A business admin creates a public widget key in the dashboard, then embeds:
 
 Both attributes are required; the widget logs an error and stays hidden if either is missing.
 
+The widget cannot import dashboard code, so its design tokens are generated from
+`platform-frontend/src/styles/tokens.css`. After changing that file, run `npm run gen:tokens` in
+`platform-frontend/`; the widget build and a drift test fail if the generated copy is stale.
+
 ## Development
 
 - Backend lint/type-check: `docker compose exec api ruff check src && docker compose exec api mypy src`
