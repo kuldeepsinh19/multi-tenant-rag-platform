@@ -202,6 +202,27 @@ GROQ_API_KEY=your-groq-key
 Restart the `api` and `worker` containers and the platform uses Groq — everything else
 (retrieval, citations, guardrails) is unchanged.
 
+## Embedding the widget
+
+The widget is a separate build target (`platform-frontend/widget/`) that produces a single
+`widget.js` with no React inside, so it stays light on a customer's page:
+
+```bash
+cd platform-frontend/widget
+npm install
+npm run build        # → widget/dist/widget.js
+```
+
+A business admin creates a public widget key in the dashboard, then embeds:
+
+```html
+<script src="https://your-cdn.example.com/widget.js"
+        data-public-key="pk_xxx"
+        data-api-base="https://api.example.com"></script>
+```
+
+Both attributes are required; the widget logs an error and stays hidden if either is missing.
+
 ## Development
 
 - Backend lint/type-check: `docker compose exec api ruff check src && docker compose exec api mypy src`
