@@ -78,7 +78,8 @@ docker compose up -d api worker frontend
 - Redis: localhost:6379
 
 `docker compose ps` should show all five services `Up`/`healthy`. Backend migrations
-(Alembic) run automatically on API container start.
+(Alembic) run automatically on API container start. To follow what the API and the ingestion
+worker are doing, run `docker compose logs -f api worker`.
 
 ## Running it live (with a real API key)
 
