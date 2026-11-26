@@ -283,6 +283,11 @@ cd platform-backend && npx promptfoo@latest eval -c promptfooconfig.yaml
 docker compose exec api python scripts/eval_retrieval.py --min-precision 0.6 --min-recall 0.6
 ```
 
+`scripts/eval_ragas.py` is a documented scaffold for offline Ragas scoring (faithfulness,
+answer relevancy, context precision) over `evals/golden_dataset.json`. Ragas is kept out of the
+running image on purpose; install it with `pip install -e '.[evals-offline]'` in an eval
+environment first.
+
 ## License
 
 [MIT](LICENSE).
